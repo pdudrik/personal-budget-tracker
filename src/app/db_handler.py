@@ -126,14 +126,31 @@ def delete_expenses_record(recordId):
 
 
 ################### GOALS ###################
-def add_goal_record(name, targetAmmount, currentAmmount, deadline, ts, note=None):
+def get_all_goals_records():
+    goalsRecrods = Goal.query.all()
+    outputData = []
+    for record in goalsRecrods:
+        outputData.append({
+            "id": record._id,
+            "name": record.name,
+            "targetAmmount": record.targetAmmount,
+            "currentAmmount": record.currentAmmount,
+            "currency": record.currency,
+            "deadline": record.deadline.strftime("%d.%m.%Y"),
+            "note": record.note,
+        })
+    
+    return outputData
+
+
+def add_goals_record(name, targetAmmount, currentAmmount, deadline, note=None):
     goal = Goal(name=name, targetAmmount=targetAmmount, currentAmmount=currentAmmount,
-                  deadline=deadline, note=note, ts=ts)
+                  deadline=deadline, note=note)
     db.session.add(goal)
     db.session.commit()
 
 
-def update_goal_record(recordId, **kwargs):
+def update_goals_record(recordId, **kwargs):
     goalRecord = Goal.query.filter_by(_id=recordId).first()
     if goalRecord is None:
         print(f"Goal record with ID={recordId} not found")
@@ -149,20 +166,17 @@ def update_goal_record(recordId, **kwargs):
         goalRecord.deadline = kwargs["deadline"]
     if "note" in kwargs:
         goalRecord.note = kwargs["note"]
-    if "ts" in kwargs:
-        goalRecord.ts = kwargs["ts"]
-
+    
     print(goalRecord.name)
     print(goalRecord.targetAmmount)
     print(goalRecord.currentAmmount)
     print(goalRecord.deadline)
     print(goalRecord.note)
-    print(goalRecord.ts)
 
     db.session.commit()
 
 
-def delete_goal_record(recordId):
+def delete_goals_record(recordId):
     goalRecord = Goal.query.filter_by(_id=recordId).first()
     if goalRecord is None:
         print(f"Goal record with ID={recordId} not found")

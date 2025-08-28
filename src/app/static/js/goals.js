@@ -4,22 +4,22 @@ let table = document.getElementById("table");
 table.onclick = (e) => {
     let targetRow = e.target.closest("tr");
     let recordId = targetRow.id;
-    let form = document.getElementById("expensesForm");
-    form.action = "/expenses/" + recordId + "/update";
+    let form = document.getElementById("goalsForm");
+    form.action = "/goals/" + recordId + "/update";
 
-    let ammountInput = document.getElementById("ammount");
-    let tsInput = document.getElementById("ts");
-    let categoryInput = document.getElementById("category");
-    let subcategoryInput = document.getElementById("subcategory");
+    let nameInput = document.getElementById("name");
+    let deadlineInput = document.getElementById("deadline");
+    let targetAmmountInput = document.getElementById("targetAmmount");
+    let currentAmmountInput = document.getElementById("currentAmmount");
     let noteInput = document.getElementById("note");
 
-    ammountInput.value = targetRow.cells[0].textContent.split(" ")[0];
-    categoryInput.value = targetRow.cells[2].textContent;
-    subcategoryInput.value = targetRow.cells[3].textContent;
+    nameInput.value = targetRow.cells[0].textContent;
+    targetAmmountInput.value = targetRow.cells[2].textContent.split(" ")[0];
+    currentAmmountInput.value = targetRow.cells[3].textContent.split(" ")[0];
     noteInput.value = targetRow.cells[4].textContent;
 
-    let tsValue = targetRow.cells[1].textContent;
-    let raw = (tsValue || "").trim();
+    let deadlineValue = targetRow.cells[1].textContent;
+    let raw = (deadlineValue || "").trim();
 
     // robust parse: "dd.mm.yyyy" (ignores any trailing text/time)
     const m = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
@@ -27,9 +27,9 @@ table.onclick = (e) => {
         const d  = m[1].padStart(2, "0");
         const mo = m[2].padStart(2, "0");
         const y  = m[3];
-        tsInput.value = `${y}-${mo}-${d}`;
+        deadlineInput.value = `${y}-${mo}-${d}`;
     } else {
-        tsInput.value = "";
+        deadlineInput.value = "";
     }
 }
 
@@ -40,14 +40,15 @@ function cancel_selection()
 }
 
 
-function delete_expenses_record(recordId)
+function delete_goals_record(recordId)
 {
-    const csrf = document.querySelector('#expensesForm input[name="csrf_token"]').value;
+    const csrf = document.querySelector('#goalsForm input[name="csrf_token"]').value;
     let data = {"recordId": recordId};
+    console.log(recordId);
 
     $.ajax({
         type: "POST",
-        url: "/expenses/delete-record",
+        url: "/goals/delete-record",
         data: JSON.stringify(data),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
@@ -60,3 +61,6 @@ function delete_expenses_record(recordId)
         }
     });
 }
+
+
+

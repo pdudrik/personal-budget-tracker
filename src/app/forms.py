@@ -21,3 +21,13 @@ class ExpensesForm(FlaskForm):
     note = StringField("Description")
     submit = SubmitField("Submit")
     update = SubmitField("Update")
+
+
+class GoalsForm(FlaskForm):
+    name = StringField("Goal name", validators=[DataRequired()])
+    targetAmmount = FloatField("Target ammount", validators=[DataRequired()])
+    currentAmmount = FloatField("Current ammount", validators=[DataRequired()])
+    deadline = DateField("Deadline")
+    note = StringField("Description")
+    submit = SubmitField("Submit")
+    update = SubmitField("Update")

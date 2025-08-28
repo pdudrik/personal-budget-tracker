@@ -2,8 +2,10 @@ from flask import url_for, render_template, redirect, request, jsonify
 from app import app
 from app.db_handler import get_all_income_records, add_income_record, \
     delete_income_record, update_income_record, get_all_expenses_records, \
-    add_expenses_record, update_expenses_record, delete_expenses_record
-from app.forms import IncomeForm, ExpensesForm
+    add_expenses_record, update_expenses_record, delete_expenses_record, \
+    get_all_goals_records, add_goals_record, update_goals_record, \
+    delete_goals_record
+from app.forms import IncomeForm, ExpensesForm, GoalsForm
 
 
 
@@ -134,4 +136,59 @@ def delete_expenses_route():
 ################### GOALS PAGE ###################
 @app.route("/goals", methods=["GET"])
 def goals_route():
-    return render_template("goals.html", title="Goals page", heading="GOALS")
+        form = GoalsForm()
+
+        if request.method == "GET":
+            data = get_all_goals_records()
+            print(data)
+            
+            return render_template("goals.html", title="Goals Page",
+                                   heading="GOALS", context=data, form=form)
+
+
+@app.route("/goals/new", methods=["POST"])
+def add_goals_record_route():
+    form = GoalsForm()
+    if form.validate_on_submit():
+        if form.submit.data:
+            print(f"SUBMIT: {form.submit.data}")
+            add_goals_record(name=form.name.data,
+                             targetAmmount=form.targetAmmount.data,
+                             currentAmmount=form.currentAmmount.data,
+                             deadline=form.deadline.data,
+                             note=form.note.data)
+        
+        # Handle error
+        else:
+            pass
+    
+    return redirect(url_for("goals_route"))
+
+
+@app.route("/goals/<int:recordId>/update", methods=["POST"])
+def update_goals_record_route(recordId):
+    form = GoalsForm()
+    if form.validate_on_submit():
+        if form.update.data:
+            update_goals_record(recordId,
+                                name=form.name.data,
+                                targetAmmount=form.targetAmmount.data,
+                                currentAmmount=form.currentAmmount.data,
+                                deadline=form.deadline.data,
+                                note=form.note.data)
+
+    # Handle error
+    else:
+        print("POST:", request.form.to_dict())
+        print("ERRORS:", form.errors)   # <-- read this!
+    
+    return redirect(url_for("goals_route"))
+
+
+@app.route("/goals/delete-record", methods=["POST"])
+def delete_goals_route():
+    if request.method == "POST":
+        recordId = request.get_json()["recordId"]
+        delete_goals_record(recordId)
+
+        return jsonify({"success": True})
