@@ -1,5 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>This is Income Page</p>
+    <form action="{{ url_for('add_income_record_route') }}" method="post" id="incomeForm" class="row g-3">
+        {{ form.hidden_tag() }}
+        <div class="row g-3">
+            <div class="col-md-4">
+                {{ form.ammount.label(class="form-label") }}
+                {{ form.ammount(class="form-control") }}
+            </div>
+            <div class="col-md-4">
+                {{ form.source.label(class="form-label") }}
+                {{ form.source(class="form-select") }}
+            </div>
+            <div class="col-4">
+                {{ form.ts.label(class="form-label") }}
+                {{ form.ts(class="form-control") }}
+            </div>
+        </div>
+        <div class="row g-3 mt-0">
+            <div class="col-12">
+                {{ form.note.label(class="form-label") }}
+                {{ form.note(class="form-control") }}
+            </div>
+        </div>
+        <div class="row g-3 mt-0 justify-content-end">
+            <div class="col-1">
+                <a href="{{ url_for('income_route') }}" class="btn btn-danger">Cancel</a>
+            </div>
+            <div class="col-1">
+                {{ form.update(class="btn btn-success") }}
+            </div>
+            <div class="col-1">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </div>
+    </form>
+
+
+    <table class="table table-striped table-hover mt-4" id="table">
+        <thead>
+            <tr>
+                <th scope="col">Source</th>
+                <th scope="col">Ammount</th>
+                <th scope="col">Date</th>
+                <th scope="col">Notes</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in context %}
+                <tr id="{{ record['id'] }}">
+                    <th scope="row">{{ record["source"] }}</th>
+                    <td>{{ record["ammount"] }} {{ record["currency"] }}</td>
+                    <td>{{ record["ts"] }}</td>
+                    {% if record["note"] == None %}
+                        <td></td>
+                    {% else %}
+                        <td>{{ record["note"] }}</td>
+                    {% endif %}
+                    <td>
+                        <button class="btn btn-danger" id="{{ record['id'] }}" onclick="delete_income_record(this.id)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock content %}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js" integrity="sha512-tWHlutFnuG0C6nQRlpvrEhE4QpkG1nn2MOUMWmUeRePl4e3Aki0VB6W1v3oLjFtd0hVOtRQ9PHpSfN6u6/QXkQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ url_for('static', filename='js/income.js') }}"></script>
+{% endblock script %}
