@@ -1,11 +1,20 @@
 let table = document.getElementById("table");
 
-// Load data from selected row
-table.onclick = (e) => {
-    let targetRow = e.target.closest("tr");
-    let recordId = targetRow.id;
+// Load data from selected row or press delete button
+table.addEventListener("click", (e) => {
+    const delButton = e.target.closest(".btn-del");
+    if (delButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        delete_expenses_record(delButton.dataset.id);
+        return;
+    }
+
+    const row = e.target.closest("tr");
+    if (!row) return;
+
     let form = document.getElementById("expensesForm");
-    form.action = "/expenses/" + recordId + "/update";
+    form.action = "/expenses/" + row.id + "/update";
 
     let ammountInput = document.getElementById("ammount");
     let tsInput = document.getElementById("ts");
@@ -13,12 +22,12 @@ table.onclick = (e) => {
     let subcategoryInput = document.getElementById("subcategory");
     let noteInput = document.getElementById("note");
 
-    ammountInput.value = targetRow.cells[0].textContent.split(" ")[0];
-    categoryInput.value = targetRow.cells[2].textContent;
-    subcategoryInput.value = targetRow.cells[3].textContent;
-    noteInput.value = targetRow.cells[4].textContent;
+    ammountInput.value = row.cells[0].textContent.split(" ")[0];
+    categoryInput.value = row.cells[2].textContent;
+    subcategoryInput.value = row.cells[3].textContent;
+    noteInput.value = row.cells[4].textContent;
 
-    let tsValue = targetRow.cells[1].textContent;
+    let tsValue = row.cells[1].textContent;
     let raw = (tsValue || "").trim();
 
     // robust parse: "dd.mm.yyyy" (ignores any trailing text/time)
@@ -31,7 +40,7 @@ table.onclick = (e) => {
     } else {
         tsInput.value = "";
     }
-}
+})
 
 
 function cancel_selection()

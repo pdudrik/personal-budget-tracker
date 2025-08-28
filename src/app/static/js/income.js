@@ -1,22 +1,31 @@
 let table = document.getElementById("table");
 
-// Load data from selected row
-table.onclick = (e) => {
-    let targetRow = e.target.closest("tr");
-    let recordId = targetRow.id;
+// Load data from selected row or press delete button
+table.addEventListener("click", (e) => {
+    const delButton = e.target.closest(".btn-del");
+    if (delButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        delete_income_record(delButton.dataset.id);
+        return;
+    }
+
+    const row = e.target.closest("tr");
+    if (!row) return;
+    
     let form = document.getElementById("incomeForm");
-    form.action = "/income/" + recordId + "/update";
+    form.action = "/income/" + row.id + "/update";
 
     let ammountInput = document.getElementById("ammount");
     let sourceInput = document.getElementById("source");
     let tsInput = document.getElementById("ts");
     let noteInput = document.getElementById("note");
 
-    ammountInput.value = targetRow.cells[1].textContent.split(" ")[0];
-    sourceInput.value = targetRow.cells[0].textContent;
-    noteInput.value = targetRow.cells[3].textContent;
+    ammountInput.value = row.cells[1].textContent.split(" ")[0];
+    sourceInput.value = row.cells[0].textContent;
+    noteInput.value = row.cells[3].textContent;
 
-    let tsValue = targetRow.cells[2].textContent;
+    let tsValue = row.cells[2].textContent;
     let raw = (tsValue || "").trim();
 
     // robust parse: "dd.mm.yyyy" (ignores any trailing text/time)
@@ -29,7 +38,7 @@ table.onclick = (e) => {
     } else {
         tsInput.value = "";
     }
-}
+})
 
 
 function cancel_selection()
