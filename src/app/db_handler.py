@@ -2,7 +2,7 @@ from app import db
 from app.models import Income, Expense, Goal
 
 
-# INCOME
+################### INCOME ###################
 def get_all_income_records():
     incomeRecords = Income.query.all()
     outputData = []
@@ -59,15 +59,32 @@ def delete_income_record(recordId):
     db.session.commit()
 
 
-# EXPENSES
-def add_expense_record(ammount, category, subcategory, goalFK, ts, note=None):
+################### EXPENSES ###################
+def get_all_expenses_records():
+    expensesRecrods = Expense.query.all()
+    outputData = []
+    for record in expensesRecrods:
+        outputData.append({
+            "id": record._id,
+            "ammount": record.ammount,
+            "currency": record.currency,
+            "ts": record.ts.strftime("%d.%m.%Y"),
+            "category": record.category,
+            "subcategory": record.subcategory,
+            "note": record.note,
+        })
+    
+    return outputData
+
+
+def add_expenses_record(ammount, category, subcategory, ts, goalFK=None, note=None):
     expense = Expense(ammount=ammount, category=category, subcategory=subcategory,
                       FK_expense_goal=goalFK, note=note, ts=ts)
     db.session.add(expense)
     db.session.commit()
 
 
-def update_expense_record(recordId, **kwargs):
+def update_expenses_record(recordId, **kwargs):
     expenseRecord = Expense.query.filter_by(_id=recordId).first()
     if expenseRecord is None:
         print(f"Expense record with ID={recordId} not found")
@@ -91,7 +108,6 @@ def update_expense_record(recordId, **kwargs):
     print(expenseRecord.ammount)
     print(expenseRecord.category)
     print(expenseRecord.subcategory)
-    print(expenseRecord.source)
     print(expenseRecord.FK_expense_goal)
     print(expenseRecord.note)
     print(expenseRecord.ts)
@@ -99,7 +115,7 @@ def update_expense_record(recordId, **kwargs):
     db.session.commit()
 
 
-def delete_expense_record(recordId):
+def delete_expenses_record(recordId):
     expenseRecord = Expense.query.filter_by(_id=recordId).first()
     if expenseRecord is None:
         print(f"Expense record with ID={recordId} not found")
@@ -109,7 +125,7 @@ def delete_expense_record(recordId):
     db.session.commit()
 
 
-# TARGET
+################### GOALS ###################
 def add_goal_record(name, targetAmmount, currentAmmount, deadline, ts, note=None):
     goal = Goal(name=name, targetAmmount=targetAmmount, currentAmmount=currentAmmount,
                   deadline=deadline, note=note, ts=ts)
