@@ -8,6 +8,10 @@ from app.db_handler import get_all_income_records, add_income_record, \
 from app.forms import IncomeForm, ExpensesForm, GoalsForm
 
 
+@app.route("/test", methods=["GET"])
+def test_route():
+    return render_template("test.html")
+
 
 @app.route("/index", methods=["GET"])
 @app.route("/home", methods=["GET"])
@@ -90,11 +94,12 @@ def add_expenses_record_route():
     if form.validate_on_submit():
         if form.submit.data:
             print(f"SUBMIT: {form.submit.data}")
-            add_expenses_record(ammount=form.ammount.data,
-                                category=form.category.data,
-                                subcategory=form.subcategory.data,
-                                ts=form.ts.data,
-                                note=form.note.data)
+            print(form.category.data)
+            # add_expenses_record(ammount=form.ammount.data,
+            #                     category=form.category.data,
+            #                     subcategory=form.subcategory.data,
+            #                     ts=form.ts.data,
+            #                     note=form.note.data)
         
         # Handle error
         else:

@@ -1,19 +1,26 @@
 let table = document.getElementById("table");
+// let categoryInput = document.getElementById("category");
 
 // Load data from selected row or press delete button
 table.addEventListener("click", (e) => {
     const delButton = e.target.closest(".btn-del");
+    const row = e.target.closest("tr");
+    console.log("row ID: " + row.id);
+
     if (delButton) {
+        console.log("BUTTON activated");
+        console.log(delButton);
         e.preventDefault();
         e.stopPropagation();
-        delete_expenses_record(delButton.dataset.id);
+        delete_expenses_record(row.id);
         return;
     }
 
-    const row = e.target.closest("tr");
+    console.log(row);
     if (!row) return;
 
     let form = document.getElementById("expensesForm");
+    console.log(row.id);
     form.action = "/expenses/" + row.id + "/update";
 
     let ammountInput = document.getElementById("ammount");
@@ -43,6 +50,23 @@ table.addEventListener("click", (e) => {
 })
 
 
+// categoryInput.addEventListener("change", (e) => {
+//     if (categoryInput.value == "needs") {
+//         console.log("NEEDS");
+//     } else if (categoryInput.value == "wants") {
+//         console.log("WANTS");
+//     } else if (categoryInput.value == "growth") {
+//         console.log("GROWTH");
+//     } else if (categoryInput.value == "savings") {
+//         console.log("SAVINGS");
+//     } else {
+//         console.log("UNKNOWN OPTION");
+//     }
+//     // console.log(e);
+//     // console.log(categoryInput.value);
+// })
+
+
 function cancel_selection()
 {
     alert("Cancel");
@@ -53,6 +77,7 @@ function delete_expenses_record(recordId)
 {
     const csrf = document.querySelector('#expensesForm input[name="csrf_token"]').value;
     let data = {"recordId": recordId};
+    console.log("(func) record ID: " + recordId);
 
     $.ajax({
         type: "POST",
