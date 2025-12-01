@@ -1,0 +1,21 @@
+.form-control {
+    font-size: 1.25rem;
+}
+
+.form-input {
+    min-width: 300px;
+    max-width: 400px
+}
+
+.form-button {
+    width: 120px;
+    height: 48px;
+}
+
+.mb-0 label {
+    margin-bottom: 0 !important;
+}
+
+.form-input div {
+    margin-bottom: 0 !important;
+}

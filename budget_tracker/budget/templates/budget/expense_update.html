@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}
+Update expense record
+{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/expense_update.css' %}">
+{% endblock head %}
+
+{% block content %}
+    <div class="container text-md-start text-center">
+        <h1>Update existing expense record</h1>
+    </div>
+
+    <div class="container mt-5">
+        {% comment %} {% csrf_token %} {% endcomment %}
+        {% crispy form %}
+    </div>
+    
+{% endblock content %}

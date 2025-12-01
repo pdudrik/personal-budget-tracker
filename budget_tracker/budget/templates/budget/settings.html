@@ -1,0 +1,197 @@
+{% extends "layout.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}
+Settings
+{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock head %}
+
+{% block content %}
+    <div class="container text-md-start text-center">
+        <h1>Settings</h1>
+    </div>
+
+    <div class="container mt-5">
+
+        <!-- CATEGORY SECTION -->
+        <section class="mb-5 py-4">
+            <h3 class="text-center mb-4">Categories</h3>
+            <div class="d-flex justify-content-center mb-4">
+                {% crispy category_form %}
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <table class="table table-striped table-sm w-auto mx-auto shadow-sm" style="min-width: 300px;">
+                    <thead>
+
+                        <tr>
+                            <th class="ps-2">Name</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        {% for category in category_list %}
+                            <tr>
+                                <td class="ps-3">{{ category.name }}</td>
+                                <td class="w-auto d-flex justify-content-center gap-2" style="width: 80px;">
+
+                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ category.id }}" aria-label="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <form method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="category_id" value="{{ category.id }}">
+                                        <button type="submit" name="submit_category_delete" class="btn btn-sm btn-danger" aria-label="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+
+                            <!-- Modal for editing category -->
+                            <div class="modal fade" id="editCategoryModal{{ category.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="category_id" value="{{ category.id }}">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Category</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <input type="text" name="category-name" value="{{ category.name }}" class="form-control" required>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button name="submit_category_update" type="submit" class="btn btn-primary">Save changes</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            </div>
+
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <hr class="my-5" style="height: 2px; background: linear-gradient(to right, transparent, #616a72ff, transparent); border: none;">
+
+    <!-- SUBCATEGORY SECTION -->
+        <section class="mb-5 py-4">
+            <h3 class="text-center mb-4">Subcategories</h3>
+            <div class="d-flex justify-content-center mb-4">
+                {% crispy subcategory_form %}
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <table class="table table-striped table-sm w-auto mx-auto shadow-sm" style="min-width: 380px;">
+                    <thead>
+
+                        <tr>
+                            <th class="ps-2">Name</th>
+                            <th>Category</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
+                        {% for subcategory in subcategory_list %}
+                            <tr>
+                                <td class="ps-3">{{ subcategory.name }}</td>
+                                <td>
+                                    {% if subcategory.category %}
+                                        {{ subcategory.category.name }}
+                                    {% else %}
+                                        N/A                                    
+                                    {% endif %}
+                                </td>
+                                <td class="w-auto d-flex justify-content-center gap-2" style="width: 80px;">
+
+                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editSubcategoryModal{{ subcategory.id }}" aria-label="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <form method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="subcategory_id" value="{{ subcategory.id }}">
+                                        <button type="submit" name="submit_subcategory_delete" class="btn btn-sm btn-danger" aria-label="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+
+                            <!-- Modal for editing subcategory -->
+                            <div class="modal fade" id="editSubcategoryModal{{ subcategory.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="subcategory_id" value="{{ subcategory.id }}">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Subcategory</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <label class="form-label">Name:</label>
+                                                <input type="text" name="subcategory-name" value="{{ subcategory.name }}" class="form-control" required>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+
+                                                    <label class="form-label">Parent Category:</label>
+                                                    <select name="subcategory_category_id" class="form-select">
+                                                        {% for category in category_list %}
+                                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class="modal-footer">
+                                                <button name="submit_subcategory_update" type="submit" class="btn btn-primary">Save changes</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            </div>
+
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </div>
+{% endblock content %}

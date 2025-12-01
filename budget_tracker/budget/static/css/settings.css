@@ -1,0 +1,32 @@
+.asteriskField {
+    display: none;
+}
+
+#id_category-name {
+    max-width: 250px;
+}
+
+/* Override crispy form div margin-bottom */
+#div_id_category-name {
+    margin-bottom: 0 !important;
+    white-space: nowrap;
+}
+
+#div_id_category-name label {
+    white-space: nowrap;
+    margin-bottom: 0;
+}
+
+#id_subcategory-name {
+    max-width: 250px;
+}
+
+#div_id_subcategory-name label {
+    white-space: nowrap;
+    margin-bottom: 0;
+}
+
+/* Align input and button vertically center and nowrap label */
+.d-flex.flex-md-row.align-items-center.mb-0 {
+  align-items: center !important;
+}

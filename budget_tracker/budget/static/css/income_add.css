@@ -1,0 +1,29 @@
+/* .form-input > div > select {
+    max-width: 100px;
+} */
+
+.form-control {
+    font-size: 1.25rem;
+}
+
+.form-input {
+    min-width: 300px;
+    max-width: 400px
+}
+
+.has-textarea {
+    max-width: 800px;
+}
+
+.has-textarea textarea {
+    height: 150px;
+    max-height: 400px;
+}
+
+/* .form-input > div > div > input {
+    font-size: 1.25rem;
+} */
+
+.form-button {
+    width: 120px
+}
