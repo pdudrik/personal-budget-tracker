@@ -21,3 +21,10 @@ Update expense record
     </div>
     
 {% endblock content %}
+
+{% block script %}
+    <script src="{% static 'js/subcategory_filter.js' %}"></script>
+    <script>
+        window.categoriesData = {{ categories_json|safe }}
+    </script>
+{% endblock script %}

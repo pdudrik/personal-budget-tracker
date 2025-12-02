@@ -54,10 +54,10 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'budget:expense-update' record.pk %}" class="d-block text-decoration-none text-dark">{{ record.category }}</a>
+                            <a href="{% url 'budget:expense-update' record.pk %}" class="d-block text-decoration-none text-dark">{{ record.category.name }}</a>
                         </td>
                         <td>
-                            <a href="{% url 'budget:expense-update' record.pk %}" class="d-block text-decoration-none text-dark">{{ record.subcategory }}</a>
+                            <a href="{% url 'budget:expense-update' record.pk %}" class="d-block text-decoration-none text-dark">{{ record.subcategory.name }}</a>
                         </td>
 
                         <td class="d-flex align-center justify-content-center">

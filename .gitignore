@@ -1,5 +1,7 @@
 .venv
 .vscode
-data.db
-src/app/__pycache__/
-src/app/config.py
+budget_tracker/budget/__pycache__/
+budget_tracker/budget/migrations/__pycache__/
+budget_tracker/budget_tracker/__pycache__/
+budget_tracker/db.sqlite3
+

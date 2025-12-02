@@ -1,10 +1,16 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.generic import ListView, TemplateView, FormView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
-from .utils import valid_int_id
+from django.utils.safestring import mark_safe
+from .utils import valid_int_id, get_categories_json
 from .models import *
 from .forms import *
+
+
+class HomeView(TemplateView):
+    template_name = "budget/index.html"
 
 
 #------------------------ EXPENSE ------------------------#
@@ -16,9 +22,16 @@ class ExpenseListView(ListView):
 
 class ExpenseAddView(FormView):
     template_name = "budget/expense_add.html"
-    # model = ExpenseRecord
     form_class = ExpenseRecordForm
     success_url = reverse_lazy("budget:expense-list")
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories_json"] = mark_safe(json.dumps(get_categories_json()))
+        context["category_list"] = ExpenseCategory.objects.all()
+
+        return context
 
 
     def form_valid(self, form):
@@ -38,6 +51,13 @@ class ExpenseUpdateView(UpdateView):
     model = ExpenseRecord
     form_class = ExpenseRecordForm
     success_url = reverse_lazy("budget:expense-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories_json"] = mark_safe(json.dumps(get_categories_json()))
+        # context[""]
+
+        return context
 
 
 class ExpenseDeleteView(DeleteView):
@@ -191,7 +211,7 @@ class SettingsView(TemplateView):
             "category_form": self.category_form,
             "subcategory_form": self.subcategory_form,
             "category_list": ExpenseCategory.objects.all(),
-            "subcategory_list": ExpenseSubcategory.objects.all()
+            "subcategory_list": ExpenseSubcategory.objects.all(),
         })
     
     def post(self, request, *args, **kwargs):

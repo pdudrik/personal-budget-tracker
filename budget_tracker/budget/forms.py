@@ -11,6 +11,10 @@ class ExpenseRecordForm(forms.ModelForm):
         
         self.fields["date"].widget = forms.DateInput(attrs={"type": "date"})
 
+        self.fields["category"].label_from_instance = lambda obj: obj.name
+        self.fields["subcategory"].label_from_instance = lambda obj: obj.name
+
+
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
             Row(
