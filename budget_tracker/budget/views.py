@@ -73,51 +73,6 @@ class ExpenseDeleteView(DeleteView):
     def post(self, request, *args, **kwargs):
         messages.success(request, f"Expense record \"{self.get_object().title}\" deleted successfully!")
         return super().post(request, *args, **kwargs)
-
-
-#------------------------ INCOME SOURCE ------------------------#
-class IncomeSourceListView(ListView):
-    template_name = "budget/income_source_list.html"
-    model = IncomeSource
-    context_object_name = "records"
-
-    def get_context_data(self, **kwargs):
-        context = super(IncomeSourceListView, self).get_context_data(**kwargs)
-        context['form'] = IncomeSourceForm
-        return context
-
-
-# class IncomeSourceAddView(FormView):
-#     template_name = "budget/income_add.html"
-#     form_class = IncomeSourceForm
-#     success_url = reverse_lazy("budget:income-list")
-
-
-#     def form_valid(self, form):
-#         form.save()
-#         print(f"SUCCESS: income record {form.instance.source} saved!")
-#         return super().form_valid(form)
-    
-
-#     def form_invalid(self, form):
-#         print(f"ERROR: failed to save income record {form.instance.source}!")
-#         print(form.errors.as_json())
-#         return super().form_invalid(form)
-
-
-# class IncomeSourceUpdateView(UpdateView):
-#     template_name = "budget/income_update.html"
-#     model = IncomeSource
-#     form_class = IncomeSourceForm
-#     success_url = reverse_lazy("budget:income-list")
-
-
-# class IncomeSourceDeleteView(DeleteView):
-#     model = IncomeSource
-#     success_url = reverse_lazy("budget:income-list")
-
-#     def get(self, request, *args, **kwargs):
-#         return self.delete(request, *args, **kwargs)
     
 
 #------------------------ INCOME ------------------------#
@@ -175,13 +130,16 @@ class SettingsView(TemplateView):
     template_name = "budget/settings.html"
     category_form = ExpenseCategoryForm(prefix="category")
     subcategory_form = ExpenseSubcategoryForm(prefix="subcategory")
+    source_form = IncomeSourceForm(prefix="source")
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {
             "category_form": self.category_form,
             "subcategory_form": self.subcategory_form,
+            "source_form": self.source_form,
             "category_list": ExpenseCategory.objects.all(),
             "subcategory_list": ExpenseSubcategory.objects.all(),
+            "source_list": IncomeSource.objects.all(),
         })
     
     def post(self, request, *args, **kwargs):
@@ -223,6 +181,7 @@ class SettingsView(TemplateView):
 
             except ExpenseCategory.DoesNotExist:
                 messages.error(request, "Couldn't delete selected category. Category not found.")
+
 
         ### SUBCATEGORY ###
         elif "submit_subcategory_add" in request.POST:
@@ -281,6 +240,47 @@ class SettingsView(TemplateView):
 
             except ExpenseSubcategory.DoesNotExist:
                 messages.error(request, "Couldn't delete selected subcategory. Subcategory not found.")
+    
 
+        ### INCOME SOURCE ###
+        elif "submit_source_add" in request.POST:
+            form = IncomeSourceForm(request.POST, prefix="source")
+            if form.is_valid():
+                form.save()
+                messages.success(request, "New source added successfully!")
+
+        elif "submit_source_update" in request.POST:
+            source_id = valid_int_id(request.POST.get("source_id"))
+            new_source_name = request.POST.get("source-name")
+            
+            if not source_id:
+                messages.error(request, "Invalid source ID format!")
+                return redirect("budget:settings")
+
+            try:
+                source_record = IncomeSource.objects.get(id=source_id)
+                source_record.name = new_source_name
+                source_record.save()
+                messages.success(request, "Source name changed successfully!")
+            
+            except IncomeSource.DoesNotExist:
+                messages.error(request, "Selected source does not exist!")
         
+        elif "submit_source_delete" in request.POST:
+            source_id = valid_int_id(request.POST.get("source_id"))
+
+            if not source_id:
+                messages.error(request, "Invalid source ID format!")
+                return redirect("budget:settings")
+
+            try:
+                source_record = IncomeSource.objects.get(id=source_id)
+                source_record.delete()
+                messages.success(request, "Source deleted successfully!")
+
+            except IncomeSource.DoesNotExist:
+                messages.error(request, "Couldn't delete selected source. Source not found.")
+
+    
         return redirect("budget:settings")
+    
