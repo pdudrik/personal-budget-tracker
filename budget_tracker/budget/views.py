@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.views.generic import ListView, TemplateView, FormView, UpdateView, DeleteView, View
+from django.views.generic import ListView, TemplateView, FormView, UpdateView, DeleteView, View, CreateView
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from .utils import valid_int_id, get_categories_json
@@ -20,29 +20,25 @@ class ExpenseListView(ListView):
     context_object_name = "records"
 
 
-class ExpenseAddView(FormView):
+class ExpenseAddView(CreateView):
     template_name = "budget/expense_add.html"
+    model = ExpenseRecord
     form_class = ExpenseRecordForm
     success_url = reverse_lazy("budget:expense-list")
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categories_json"] = mark_safe(json.dumps(get_categories_json()))
         context["category_list"] = ExpenseCategory.objects.all()
-
         return context
 
-
     def form_valid(self, form):
-        form.save()
-        print(f"SUCCESS: expense record {form.instance.title} saved!")
+        messages.success(self.request, f"Expense record \"{form.instance.title}\" added successfully!")
         return super().form_valid(form)
-    
 
     def form_invalid(self, form):
-        print(f"ERROR: failed to save expense record {form.instance.title}!")
         print(form.errors.as_json())
+        messages.error(self.request, "Expense record coundn't be added!")
         return super().form_invalid(form)
 
 
@@ -55,9 +51,16 @@ class ExpenseUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categories_json"] = mark_safe(json.dumps(get_categories_json()))
-        # context[""]
-
         return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, f"Expense record {form.instance.title} updated successfully!")
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print(form.errors.as_json())
+        messages.error(self.request, "Couldn't update expense record!")
+        return super().form_invalid(form)
 
 
 class ExpenseDeleteView(DeleteView):
@@ -65,35 +68,11 @@ class ExpenseDeleteView(DeleteView):
     success_url = reverse_lazy("budget:expense-list")
 
     def get(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-    
+        return self.http_method_not_allowed(request, *args, **kwargs)
 
-
-#------------------------ EXPENSE CATEGORY ------------------------#
-class ExpenseCategoryDeleteView(View):
-    def post(self, request):
-        print(request.POST)
-        # category_id = request.POST.get("category_delete_select")
-        # category = get_object_or_404(ExpenseCategory, pk=category_id)
-        # print(category.name)
-        # pk = request.POST.get("category_delete_select")
-        # print(f"PK: {pk}")
-
-        # if pk:
-        #     item = ExpenseCategory.objects.get(pk=pk)
-        #     category_name = item.name
-
-        #     item.delete()
-        #     print(f"SUCCESS: category record {category_name} deleted!")
-
-        return redirect("budget:settings")
-
-
-#------------------------ EXPENSE SUBCATEGORY ------------------------#
-class ExpenseSubcategoryDeleteView(DeleteView):
-    def post(self, request, pk):
-        ExpenseSubcategory.objects.filter(pk=pk).delete()
-        return redirect("budget:settings")
+    def post(self, request, *args, **kwargs):
+        messages.success(request, f"Expense record \"{self.get_object().title}\" deleted successfully!")
+        return super().post(request, *args, **kwargs)
 
 
 #------------------------ INCOME SOURCE ------------------------#
@@ -148,21 +127,18 @@ class IncomeListView(ListView):
     context_object_name = "records"
 
 
-class IncomeAddView(FormView):
+class IncomeAddView(CreateView):
     template_name = "budget/income_add.html"
     form_class = IncomeRecordForm
     success_url = reverse_lazy("budget:income-list")
 
-
     def form_valid(self, form):
-        form.save()
-        print(f"SUCCESS: income record {form.instance.source} saved!")
+        messages.success(self.request, f"Income record from \"{form.instance.source}\" added successfully!")
         return super().form_valid(form)
     
-
     def form_invalid(self, form):
-        print(f"ERROR: failed to save income record {form.instance.source}!")
         print(form.errors.as_json())
+        messages.error(self.request, "Income record coundn't be added!")
         return super().form_invalid(form)
 
 
@@ -172,32 +148,26 @@ class IncomeUpdateView(UpdateView):
     form_class = IncomeRecordForm
     success_url = reverse_lazy("budget:income-list")
 
+    def form_valid(self, form):
+        messages.success(self.request, f"Income record from \"{form.instance.source.name}\" updated successfully!")
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print(form.errors.as_json())
+        messages.error(self.request, "Couldn't update income record!")
+        return super().form_invalid(form)
+
 
 class IncomeDeleteView(DeleteView):
     model = IncomeRecord
     success_url = reverse_lazy("budget:income-list")
 
     def get(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-        
+        return self.http_method_not_allowed(request, *args, **kwargs)
 
-    # def get(self, request, *args, **kwargs):
-    #     return render(request, self.template_name, {"form": self.form})
-    
-    # def post(self, request, *args, **kwargs):
-    #     obj = self.form(request.POST)
-
-    #     if obj.is_valid():
-    #         obj.save()
-
-    #         print(f"SUCCESS: expense record {obj.instance.title} saved!")
-    #         # print("SUCCESS")
-        
-    #     else:
-    #         print(f"ERROR: failed to save expense record {obj.instance.title}!")
-    #         # print("ERROR")
-        
-    #     return redirect("budget:expense-list")
+    def post(self, request, *args, **kwargs):
+        messages.success(request, f"Income record from \"{self.get_object().source.name}\" deleted successfully!")
+        return super().post(request, *args, **kwargs)
 
 
 #------------------------ SETTINGS ------------------------#
