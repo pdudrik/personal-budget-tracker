@@ -1,6 +1,14 @@
 # Personal Budget Tracker
 Don't worry, rather track where your money goes with this web app!
 
+## Setup
+### Enviroment variables
+1. Create .env file in root project directory
+2. Add variables and assgin values for:
+```
+SECRET_KEY=""
+ALLOWED_HOSTS='["localhost", "127.0.0.1"]'      # as JSON
+```
 
 ## Agenda
 1. Add user authentication - store data for multiple users their own.
