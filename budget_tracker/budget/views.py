@@ -1,10 +1,12 @@
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.views.generic import ListView, TemplateView, FormView, UpdateView, DeleteView, View, CreateView
+from django.views.generic import ListView, TemplateView, UpdateView, DeleteView, CreateView, DetailView
 from django.urls import reverse_lazy
+from django.db.models import Sum, DecimalField
+from django.db.models.functions import Coalesce
 from django.utils.safestring import mark_safe
-from .utils import valid_int_id, get_categories_json
+from .utils import valid_int_id, get_categories_json, get_goal_balance
 from .models import *
 from .forms import *
 
@@ -30,6 +32,7 @@ class ExpenseAddView(CreateView):
         context = super().get_context_data(**kwargs)
         context["categories_json"] = mark_safe(json.dumps(get_categories_json()))
         context["category_list"] = ExpenseCategory.objects.all()
+        context["goal_list"] = Goal.objects.all()
         return context
 
     def form_valid(self, form):
@@ -122,6 +125,80 @@ class IncomeDeleteView(DeleteView):
 
     def post(self, request, *args, **kwargs):
         messages.success(request, f"Income record from \"{self.get_object().source.name}\" deleted successfully!")
+        return super().post(request, *args, **kwargs)
+    
+
+#------------------------ GOALS ------------------------#
+class GoalListView(ListView):
+    template_name = "budget/goal_list.html"
+    model = Goal
+    context_object_name = "records"
+    
+    def get_queryset(self):
+        return Goal.objects.annotate(
+            balance=Coalesce(Sum("expenses__value"), 0, output_field=DecimalField())
+        ).order_by("-created")
+
+
+class GoalAddView(CreateView):
+    template_name = "budget/goal_add.html"
+    form_class = GoalForm
+    success_url = reverse_lazy("budget:goal-list")
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Goal \"{form.instance.name}\" added successfully!")
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print(form.errors.as_json())
+        messages.error(self.request, "Goal coundn't be added!")
+        return super().form_invalid(form)
+
+
+class GoalDetailView(DetailView):
+    template_name = "budget/goal_detail.html"
+    model = Goal
+    context_object_name = "goal"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        balance = get_goal_balance(self.object.pk)
+        context["balance"] = balance or 0
+
+        if self.object.target_value and self.object.target_value > 0:
+            progress = (balance / self.object.target_value) * 100
+            context["progress_percentage"] = round(progress, 2)
+        else:
+            context["progress_percentage"] = 0
+
+        return context
+
+
+class GoalUpdateView(UpdateView):
+    template_name = "budget/goal_update.html"
+    model = Goal
+    form_class = GoalForm
+    success_url = reverse_lazy("budget:goal-list")
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Goal \"{self.object.name}\" updated successfully!")
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print(form.errors.as_json())
+        messages.error(self.request, f"Couldn't update goal \"{self.object.name}\"!")
+        return super().form_invalid(form)
+
+
+class GoalDeleteView(DeleteView):
+    model = Goal
+    success_url = reverse_lazy("budget:goal-list")
+
+    def get(self, request, *args, **kwargs):
+        return self.http_method_not_allowed(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        messages.success(request, f"Goal \"{self.get_object().name}\" deleted successfully!")
         return super().post(request, *args, **kwargs)
 
 

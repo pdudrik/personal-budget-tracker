@@ -27,6 +27,7 @@
                     <th scope="col">Date</th>
                     <th scope="col">Title</th>
                     <th scope="col">Value</th>
+                    <th scope="col">Goal</th>
                     <th scope="col">Category</th>
                     <th scope="col">Subcategory</th>
                     <th scope="col" class="text-center">Options</th>
@@ -53,6 +54,9 @@
                                     <span> {{ record.currency }}</span>
                                 {% endif %}
                             </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'budget:expense-update' record.pk %}" class="d-block text-decoration-none text-dark">{{ record.goal.name }}</a>
                         </td>
                         <td>
                             <a href="{% url 'budget:expense-update' record.pk %}" class="d-block text-decoration-none text-dark">{{ record.category.name }}</a>

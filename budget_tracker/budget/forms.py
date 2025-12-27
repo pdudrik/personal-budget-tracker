@@ -13,6 +13,7 @@ class ExpenseRecordForm(forms.ModelForm):
 
         self.fields["category"].label_from_instance = lambda obj: obj.name
         self.fields["subcategory"].label_from_instance = lambda obj: obj.name
+        self.fields["goal"].label_from_instance = lambda obj: obj.name
 
 
         self.helper = FormHelper(self)
@@ -21,6 +22,7 @@ class ExpenseRecordForm(forms.ModelForm):
                 Column('date', css_class='col-md-3 form-input form-control-lg'),
                 Column('title', css_class='col-md-3 form-input form-control-lg'),
                 Column('value', css_class='col-md-3 form-input form-control-lg'),
+                Column('goal', css_class='col-md-3 form-input form-control-lg'),
                 css_class="justify-content-center",
             ),
             Row(
@@ -47,7 +49,8 @@ class ExpenseRecordForm(forms.ModelForm):
             "value",
             "category",
             "subcategory",
-            "description"
+            "description",
+            "goal"
         ]
 
 
@@ -113,6 +116,8 @@ class IncomeRecordForm(forms.ModelForm):
         
         self.fields["date"].widget = forms.DateInput(attrs={"type": "date"})
 
+        self.fields["source"].label_from_instance = lambda obj: obj.name
+
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
             Row(
@@ -168,3 +173,40 @@ class IncomeSourceForm(forms.ModelForm):
             )
         )
         self.fields["name"].label = "New income source:"
+
+
+class GoalForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(GoalForm, self).__init__(*args, **kwargs)
+        
+        self.fields["deadline"].widget = forms.DateInput(attrs={"type": "date"})
+
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column('deadline', css_class='col-md-3 form-input form-control-lg'),
+                Column('name', css_class='col-md-3 form-input form-control-lg'),
+                Column('target_value', css_class='col-md-3 form-input form-control-lg'),
+                Column('status', css_class='col-md-3 form-input form-control-lg'),
+                css_class="justify-content-center",
+            ),
+            Row(
+                Column('description', css_class='col-md-12 form-input form-control-lg has-textarea'),
+                css_class="justify-content-center",
+            ),
+            Row(
+                Reset("reset", "Reset", css_class="col-md-2 btn-danger btn-lg form-button me-4"),
+                Submit("submit", "Submit", css_class="col-md-2 btn-lg form-button"),
+                css_class="justify-content-center mt-3",
+            ))
+
+
+    class Meta:
+        model = Goal
+        fields = [
+            "deadline",
+            "name",
+            "target_value",
+            "status",
+            "description"
+        ]

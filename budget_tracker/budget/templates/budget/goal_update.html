@@ -3,20 +3,19 @@
 {% load static %}
 
 {% block title %}
-Update income record
+Update goal
 {% endblock title %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static 'css/expense_update.css' %}">
+    <link rel="stylesheet" href="{% static 'css/goal_add.css' %}">
 {% endblock head %}
 
 {% block content %}
     <div class="container text-md-start text-center">
-        <h1>Update existing income record</h1>
+        <h1>Goal: {{ goal.name }}</h1>
     </div>
 
     <div class="container mt-5">
-        {% comment %} {% csrf_token %} {% endcomment %}
         {% crispy form %}
     </div>
     
